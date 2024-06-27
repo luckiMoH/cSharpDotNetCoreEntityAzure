@@ -15,28 +15,16 @@ namespace RestaurantApi.Controllers
             _service = service;
         }
 
-        [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        [HttpPost("generate")]
+        public ActionResult<IEnumerable<WeatherForecast>> Generate([FromQuery] int resultsCount, [FromBody] TemperatureRequest request)
         {
-            var result = _service.Get();
-            return result;
-        }
+            if (resultsCount < 0 || request.Max < request.Min)
+            {
+                return BadRequest();
+            }
 
-        [HttpGet("currentDay/{max}")]    
-        public IEnumerable<WeatherForecast> Get2([FromQuery]int take, [FromRoute]int max)
-        {
-            var result = _service.Get();
-            return result;
-        }
-
-        [HttpPost]
-        public ActionResult<string> Hello([FromBody]string name)
-        {
-            // HttpContext.Response.StatusCode = 401;
-
-            //return StatusCode(401, $"Hello Mr {name}");
-
-            return NotFound($"Hello Panie {name}");
+            var result = _service.Get(resultsCount, request.Min, request.Max);
+            return Ok(result);
         }
     }
 }
